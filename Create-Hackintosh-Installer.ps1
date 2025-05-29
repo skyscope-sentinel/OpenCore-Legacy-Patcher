@@ -26,8 +26,8 @@ function Test-IsAdmin {
         Test-IsAdmin
     #>
     Write-Verbose "Checking for Administrator privileges..."
-    $currentUser = New-Object Security.Principal.WindowsPrincipal $(New-Object Security.Principal.WindowsIdentity_Identity]::GetCurrent())
-    if (-not $currentUser.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+    $currentUser = New-Object System.Security.Principal.WindowsPrincipal ([System.Security.Principal.WindowsIdentity]::GetCurrent())
+    if (-not $currentUser.IsInRole([System.Security.Principal.WindowsBuiltInRole]::Administrator)) {
         Write-Error "Administrator privileges are required to run this script. Please re-run as Administrator."
         # In a GUI environment, you might prompt to re-launch as admin.
         # For now, we just exit.
