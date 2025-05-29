@@ -209,7 +209,7 @@ function Get-AvailableUsbDrives {
                 SizeGB = [Math]::Round($disk.Size / 1GB, 2)
                 DriveLetters = $driveLettersString
             }
-            Write-Host "  [+] Found USB: $($disk.FriendlyName) (Disk $($disk.DiskNumber), $($([Math]::Round($disk.Size / 1GB, 2)) GB), Letters: $driveLettersString)"
+            Write-Host "  [+] Found USB: $($disk.FriendlyName) (Disk $($disk.DiskNumber), $($([Math]::Round($disk.Size / 1GB, 2))) GB, Letters: $driveLettersString)"
         }
     }
     catch {
