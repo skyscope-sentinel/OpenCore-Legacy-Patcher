@@ -489,7 +489,13 @@ function ConvertTo-PlistXmlNode {
         }
         $xmlOutput += "$indent</array>`n"
     } elseif ($InputObject -is [bool]) { # Boolean
-        $xmlOutput += "$indent$((if ($InputObject) { "<true/>" } else { "<false/>" }))`n"
+        $boolStr = ""
+        if ($InputObject -eq $true) { # Explicitly compare with $true
+            $boolStr = "<true/>"
+        } else {
+            $boolStr = "<false/>"
+        }
+        $xmlOutput += "$indent$boolStr`n"
     } elseif ($InputObject -is [int] -or $InputObject -is [long] -or $InputObject -is [double] -or $InputObject -is [float]) { # Integer/Real
         $xmlOutput += "$indent<integer>$($InputObject)</integer>`n"
     } elseif ($InputObject -is [string] -and $InputObject.StartsWith("<data>") -and $InputObject.EndsWith("</data>")) { # Pre-formatted data
