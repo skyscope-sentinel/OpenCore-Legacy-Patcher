@@ -9,7 +9,9 @@ Any Intel-based Mac listed below can install and make use of OpenCore Legacy Pat
 It is **extremely recommended** to update your Mac to its latest native version before using OpenCore Legacy Patcher, to ensure you're on the highest firmware.
 :::
 
-
+::: warning 3GB+ RAM required for installing macOS Sonoma and newer
+Models with 2GB RAM will not be able to install macOS Sonoma or macOS Sequoia, additionally macOS Sequoia may be unable to boot. These versions may be installed using a disk swap method where installation is done on another system but your mileage may vary and this is not recommended.
+:::
 
 The below tables can be used to reference issues with a particular model, and see which OS would work best on your machine.
 * [MacBook](#macbook)
@@ -48,7 +50,7 @@ The below tables can be used to reference issues with a particular model, and se
 | MacBook Air (13-inch, Mid 2013)<br>MacBook Air (13-inch, Early 2014) | `MacBookAir6,2` | ^^ |
 | MacBook Air (11-inch, Early 2015) | `MacBookAir7,1` | ^^ |
 | MacBook Air (13-inch, Early 2015)<br>MacBook Air (13-inch, 2017) | `MacBookAir7,2` | ^^ |
-| MacBook Air (Retina, 13-inch, 2018) | `MacBookAir8,1` | - Supported natively up to Sonoma<br>- Currently not supported on Sequoia due to T2 issues<br> |
+| MacBook Air (Retina, 13-inch, 2018) | `MacBookAir8,1` | - Supported natively up to Sonoma<br>- [Currently not supported with OpenCore due to T2 issues](https://github.com/dortania/OpenCore-Legacy-Patcher/issues/1136)<br> |
 | MacBook Air (Retina, 13-inch, 2019) | `MacBookAir8,2` | ^^ |
 | MacBook Air (Retina, 13-inch, 2020) | `MacBookAir9,1` | Supported by Apple |
 
@@ -82,7 +84,7 @@ The below tables can be used to reference issues with a particular model, and se
 | MacBook Pro (13-inch, 2017, 4 Thunderbolt 3 ports) | `MacBookPro14,2` | ^^ |
 | MacBook Pro (15-inch, 2017) | `MacBookPro14,3` | - [Legacy Metal (macOS 14+)](https://github.com/dortania/OpenCore-Legacy-Patcher/issues/1008) |
 | MacBook Pro (13-inch, 2018, 4 Thunderbolt 3 ports)<br>MacBook Pro (13-inch, 2019, 4 Thunderbolt 3 ports) | `MacBookPro15,2` | - Supported by Apple |
-| MacBook Pro (15-inch, 2018)<br>MacBook Pro (15-inch, 2019) | `MacBookPro15,1` | ^^ |
+| MacBook Pro (15-inch, 2018)<br>MacBook Pro (15-inch, 2019) | `MacBookPro15,1`<br>`MacBookPro15,3` | ^^ |
 | MacBook Pro (13-inch, 2019, 2 Thunderbolt 3 ports) | `MacBookPro15,4` | ^^ |
 | MacBook Pro (16-inch, 2019) | `MacBookPro16,1`<br>`MacBookPro16,4` | ^^ |
 | MacBook Pro (13-inch, 2020, 4 Thunderbolt 3 ports) | `MacBookPro16,2` | ^^ |

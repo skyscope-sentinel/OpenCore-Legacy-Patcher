@@ -5,8 +5,10 @@ Here are some common errors that users may experience while using this patcher:
 * [OpenCore Legacy Patcher not launching](#opencore-legacy-patcher-not-launching)
 * ["You don't have permission to save..." error when creating USB installer](#you-don-t-have-permission-to-save-error-when-creating-usb-installer)
 * [Stuck on `This version of Mac OS X is not supported on this platform` or (🚫) Prohibited Symbol](#stuck-on-this-version-of-mac-os-x-is-not-supported-on-this-platform-or-🚫-prohibited-symbol)
+* [Stuck on hard disk selection with greyed out buttons in installer](#stuck-on-hard-disk-selection-with-greyed-out-buttons-in-installer)
 * [Cannot boot macOS without the USB](#cannot-boot-macos-without-the-usb)
-* [Infinite Recovery OS Booting](#infinite-recovery-os-reboot)
+* [Infinite Recovery OS Booting](#infinite-recovery-os-booting)
+* [Internal disk missing when building OpenCore](#internal-disk-missing-when-building-opencore)
 * [System version mismatch error when root patching](#system-version-mismatch-error-when-root-patching)
 * [Stuck on boot after root patching](#stuck-on-boot-after-root-patching)
 * ["Unable to resolve dependencies, error code 71" when root patching](#unable-to-resolve-dependencies-error-code-71-when-root-patching)
@@ -16,8 +18,8 @@ Here are some common errors that users may experience while using this patcher:
 * [No Brightness Control](#no-brightness-control)
 * [Cannot connect Wi-Fi on Monterey with legacy cards](#cannot-connect-Wi-Fi-on-Monterey-with-legacy-cards)
 * [No Graphics Acceleration](#no-graphics-acceleration)
-* [Black Screen on MacBookPro11,3 in macOS Monterey](#black-screen-on-macbookpro113-in-macos-monterey)
-* [No DisplayPort Output on Mac Pros with NVIDIA Kepler](#no-displayport-output-on-mac-pros-with-NVIDIA-kepler)
+* [Black Screen on MacBookPro11,3 in macOS Monterey](#black-screen-on-macbookpro11-3-in-macos-monterey)
+* [No DisplayPort Output on Mac Pros with NVIDIA Kepler](#no-displayport-output-on-mac-pros-with-nvidia-kepler)
 * [Volume Hash Mismatch Error in macOS Monterey](#volume-hash-mismatch-error-in-macos-monterey)
 * [Cannot Disable SIP in recoveryOS](#cannot-disable-sip-in-recoveryos)
 * [Stuck on "Less than a minute remaining..."](#stuck-on-less-than-a-minute-remaining)
@@ -28,10 +30,10 @@ Here are some common errors that users may experience while using this patcher:
 
 ## OpenCore Legacy Patcher not launching
 
-If the application won't launch (e.g. icon will bounce in the Dock), try launching OCLP via Terminal by typing the following command, make sure you've moved the app to `/Applications` before this.
+If the application won't launch (e.g. icon will bounce in the Dock), try launching OCLP via Terminal by typing the following command.
 
 ```sh
-/Applications/OpenCore-Patcher.app/Contents/MacOS/OpenCore-Patcher
+/Library/Application Support/Dortania/OpenCore-Patcher.app/Contents/MacOS/OpenCore-Patcher
 ```
 
 ## "You don't have permission to save..." error when creating USB installer
@@ -39,8 +41,8 @@ If the application won't launch (e.g. icon will bounce in the Dock), try launchi
 In some cases, a following error saying "The bless of the installer disk failed" stating the reason as "You don't have permission to save..." may appear. 
 
 
-<div align="center">
-             <img src="./images/Error-No-Permission-To-Save.png" alt="NoPermissionToSave" width="400" />
+<div align="left">
+             <img src="./images/Error-No-Permission-To-Save.png" alt="NoPermissionToSave" width="600" />
 </div>
 
 
@@ -65,6 +67,12 @@ Once you've booted OpenCore at least once, your hardware should now auto-boot it
 
 However, if the 🚫 Symbol only appears after the boot process has already started (the bootscreen appears/verbose boot starts), it could mean that your USB drive has failed to pass macOS' integrity checks. To resolve this, create a new installer using a different USB drive (preferably of a different model.)
 
+## Stuck on hard disk selection with greyed out buttons in installer
+
+Switch installer language to English. If the language selector doesn't show up, [reset NVRAM](https://support.apple.com/en-mide/102603) and boot into the installer again.
+
+You can switch back to different language once macOS has installed.
+
 ## Cannot boot macOS without the USB
 
 By default, the OpenCore Patcher won't install OpenCore onto the internal drive itself during installs.
@@ -79,15 +87,61 @@ With OpenCore Legacy Patcher, we rely on Apple Secure Boot to ensure OS updates 
 
 * Note: Machines with modified root volumes will also result in an infinite recovery loop until integrity is restored.
 
+## Internal disk missing when building OpenCore
+
+If you're using a brand new disk that has not been used before or was never formatted in any macOS type, you may face the following error in OCLP when trying to build on the internal disk.
+
+<div align="left">
+             <img src="./images/OCLP_Failed_to_find_applicable_disks.png" alt="Failed to find applicable disks" width="600" />
+</div>
+
+There are two ways to to try and resolve this.
+
+1. Create a new FAT32 partition using Disk Utility, sized at around 100MB, naming does not matter. OpenCore will detect it and you will be able to build your EFI there.
+
+2. When installing macOS, choose "View -> Show all devices" in Disk Utility and format the entire disk by choosing the topmost option in the sidebar.
+
+<div align="left">
+             <img src="./images/wipe-disk.png" alt="Wipe disk" width="800" />
+</div>
+
+
 ## System version mismatch error when root patching
 
-Updates from now on modify the system volume already while downloading, which can lead to broken patches out of a sudden as well as a "version mismatch" error while root patching, since the operating system gets into a liminal state between two versions. The "version mismatch" error is a safeguard preventing OCLP from patching on a system that is in a weird liminal state, to avoid leading to a very likely boot failure.
+Due to a change by Apple, updates now modify the system volume **already while downloading**, which can lead to broken patches out of a sudden, since the operating system gets into a liminal state between two versions. Hence while root patching, you may get an error that looks like the following: 
 
-Currently there is a "PurgePendingUpdate" tool available [on the Discord server](https://discord.com/channels/417165963327176704/1037474131526029362/1255993208966742108) you can download and then run it in Terminal, to get rid of a pending update. This may be integrated into OCLP later on, however there is currently no ETA.
+`SystemVersion.plist build version mismatch: found 15.4 (24E247), expected 13.7.5 (22H527)`
 
-Disabling automatic macOS updates is extremely recommended once recovered, to prevent it from happening again.
+In this example, it is telling that a version 13.7.5 (Ventura) is expected which is currently running but macOS has already staged an update to version 15.4 (Sequoia) and has already modified the filesystem to prepare for an update, including writing the new version in SystemVersion.plist where OCLP is able to read it from. The "version mismatch" error is a safeguard preventing OCLP from patching on a system that is in a weird liminal state, to avoid leading to a very likely boot failure.
+
+There are few options to resolve it:
+
+1. Update/upgrade to the version already staged.
+2. Reinstall macOS.
+   * You can try doing an in-place install without wiping the disk to keep your data but this may not be possible due to the OS being partially on newer version and it will complain about downgrade.
+4. Use an experimental "PurgePendingUpdate" tool [from the Discord server](https://discord.com/channels/417165963327176704/1253268648324235345/1257348959454625985).
+   * Download it and then run it in Terminal to get rid of a pending update, then repatch again. If "purge failed" appears, you can ignore it.
+   * This may be integrated into OCLP later on, however there is currently no ETA.
+
+**Disabling automatic macOS updates is extremely recommended once recovered, to prevent it from happening again.**
+
+* Note: macOS Sequoia has begun prompting to enable automatic updates from 15.4 onward after an update install has finished and isn't giving a choice to fully decline, this means you may have to keep doing it again after updating to newer versions.
+
+::: details How to disable updates (click to expand)
+
+**macOS Ventura and newer:**
+
+System Settings -> General -> Software Update -> (i) button next to Automatic Updates -> Disable "Download new updates when available".
+
+**macOS Big Sur and Monterey:**
+
+System Preferences -> Software Update -> Advanced -> Disable "Download new updates when available".
+
+:::
 
 ## Stuck on boot after root patching
+
+**Applies to macOS Monterey and newer. Big Sur does not support snapshot reversion.**
 
 Boot into recovery by pressing space when your disk is selected on the OCLP bootpicker (if you have it hidden, hold ESC while starting up)
 
@@ -188,13 +242,17 @@ Due to Apple dropping NVIDIA Kepler support in macOS Monterey, [MacBookPro11,3's
 
 If you're having trouble with DisplayPort output on Mac Pros, try enabling Minimal Spoofing in Settings -> SMBIOS Settings and rebuild/install OpenCore. This will trick macOS drivers into thinking you have a newer MacPro7,1 and resolve the issue.
 
-![](./images/OCLP-GUI-SMBIOS-Minimal.png)
+
+<div align="left">
+             <img src="./images/OCLP-GUI-SMBIOS-Minimal.png" alt="GUI SMBIOS minimal" width="800" />
+</div>        
+
 
 ## Volume Hash Mismatch Error in macOS Monterey
 
 A semi-common popup some users face is the "Volume Hash Mismatch" error:
 
-<p align="center">
+<p align="left">
 <img src="./images/Hash-Mismatch.png">
 </p>
 
@@ -233,7 +291,7 @@ Because this step can take a few hours or more depending on drive speeds, be pat
 
 ## No acceleration after a Metal GPU swap on Mac Pro
 
-If you finished installing Monterey with the original card installed (to see bootpicker for example) and swapped your GPU to a Metal supported one, you may notice that you're missing acceleration. To fix this, open OCLP and revert root patches to get your Metal-supported GPU work again.
+If you finished installing macOS with the original card installed (to see bootpicker for example) and swapped your GPU to a Metal supported one, you may notice that you're missing acceleration. To fix this, open OCLP and revert root patches to get your Metal-supported GPU work again. In macOS Ventura and newer, repatching is needed after reversion.
 
 Alternatively, you can remove "AutoPkg-Assets.pkg" from /Library/Packages on the USB drive before proceeding with the installation. To see the folder, enable hidden files with `Command` + `Shift` + `.`
 
@@ -241,23 +299,9 @@ The reason for this is that the autopatcher will assume that you will be using t
 
 ## Keyboard, Mouse and Trackpad not working in installer or after update
 
-For Macs using legacy USB 1.1 controllers, OpenCore Legacy Patcher can only restore support once it has performed root volume patches. Thus to install macOS, you need to hook up a USB hub between your Mac and Keyboard/Mouse.
-
-::: warning Note
-
-In macOS Sonoma, this seems to have been further weakened and some hubs may not be functional. 
-
-Alternative way is making sure to enable "Remote Login" in General -> Sharing before updating, which will enable SSH. That means you can take control using Terminal in another system by typing `ssh username@lan-ip-address` and your password. After that run Post Install Volume Patching by typing `/Applications/OpenCore-Patcher.app/Contents/MacOS/OpenCore-Patcher --patch_sys_vol` and finally `sudo reboot`.
-
-:::
-
-
+Starting from macOS Ventura, USB 1.1 drivers are no longer provided in the operating system. For Macs using legacy USB 1.1 controllers, OpenCore Legacy Patcher can only restore support once it has performed root volume patches which restore the drivers. Thus when installing macOS or after an update, you need to hook up a USB hub between your Mac and keyboard/mouse, forcing USB 2.0 mode in order to install the root patches.
 
 * For MacBook users, you'll need to find an external keyboard/mouse in addition to the USB hub
-
-More information can be found here:
-
-* [Legacy UHCI/OHCI support in Ventura #1021](https://github.com/dortania/OpenCore-Legacy-Patcher/issues/1021)
 
 Applicable models include:
 
@@ -271,10 +315,42 @@ Applicable models include:
 | Mac Pro     | Mid 2010 and older   | MacPro3,1 - MacPro5,1         |                                                  |
 
 
-![](./images/usb11-chart.png)
+<div align="left">
+             <img src="./images/usb11-chart.png" alt="USB1.1 chart" width="800" />
+</div>
+
+::: warning Note
+
+In macOS Sonoma, this seems to have been further weakened and some hubs may not be functional. If you encounter this issue, try another hub.
+
+:::
+
+### Alternative method for Software Update
+
+Alternative way for updates is making sure to enable "Remote Login" in General -> Sharing before updating, which will enable SSH. That means you can take control using Terminal in another system and run Post Install Volume Patching. 
+
+**This only applies to updates via Software Update and is not applicable when booting to installer via USB drive.**
+
+Use the following commands:
+
+1. `ssh username@lan-ip-address` - Connects via SSH, change username and IP address to the system's
+2. `/Applications/OpenCore-Patcher.app/Contents/MacOS/OpenCore-Patcher --patch_sys_vol` - Installs root patches via CLI
+3. `sudo reboot`.
+
+More information can be found here:
+
+* [Legacy UHCI/OHCI support in Ventura #1021](https://github.com/dortania/OpenCore-Legacy-Patcher/issues/1021)
+
 
 ## No T1 functionality after installing Sonoma or newer
 
 If you notice your Touchbar etc not working, this means loss of T1 functionality. 
 
-Wiping the entire disk using Disk Utility with Sonoma or newer causes the T1 firmware to be removed, which due to removed support, the macOS Sonoma+ installer will not restore. To restore T1 functionality, Ventura or older has to be reinstalled. This can be done in another volume or external disk as well, as long as the OS is booted once. After this you can wipe the old OS or unplug the external disk.
+Wiping the entire disk using Disk Utility with Sonoma or newer causes the T1 firmware to be removed, which due to removed support, the macOS Sonoma+ installer will not restore. If the firmware is missing from EFI, T1 will not work regardless whether OCLP reinstates the driver during root patching. To restore T1 functionality, Ventura or older has to be reinstalled. This can be done in another volume or external disk as well, as long as the OS is booted once. After this you can wipe the old OS or unplug the external disk.
+
+
+To prevent this from happening in the future, with T1 systems only wipe the volume containing the operating system.
+
+<div align="left">
+             <img src="./images/wipe-volume.png" alt="WipeVolume" width="800" />
+</div>
