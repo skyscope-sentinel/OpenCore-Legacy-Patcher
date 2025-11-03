@@ -3,7 +3,7 @@
 * [Application requirements](#application-requirements)
 * [Application versioning](#application-versioning)
 * [How do I make sure I'm all up to date?](#how-do-i-make-sure-i-m-all-up-to-date)
-* [Why are the settings "not saving"?](#why-are-the-settings-not-saving)
+* [Where are the GUI settings saved?](#where-are-the-gui-settings-saved)
 * [Can I use the same USB install media as a universal installer?](#can-i-use-the-same-usb-install-media-as-a-universal-installer)
 * [Can I use OTA updates?](#can-i-use-ota-updates)
 * [Can I use automatic updates?](#can-i-use-automatic-updates)
@@ -66,9 +66,9 @@ When building OpenCore on a different system, OCLP cannot be aware of all the ha
 
 ## Can I use OTA updates?
 
-You can. However it is extremely recommended to use USB drive for major OS upgrades (such as 13 -> 14) to avoid larger issues from potentially occurring.
+You can. However it is extremely recommended to use USB drive for major OS upgrades (such as 13 -> 14) to avoid larger issues from potentially occurring. General updates are usually fine, though it is always a good idea to wait few days to see whether patches break and have to be fixed.
 
-General updates are usually fine, though it is always a good idea to wait few days to see whether patches break and have to be fixed.
+See more information about updating in [Preparing OCLP for macOS update.](https://dortania.github.io/OpenCore-Legacy-Patcher/UPDATE.html#preparing-oclp-for-macos-update)
 
 ## Can I use automatic updates?
 
@@ -106,7 +106,7 @@ macOS doesn't allow direct downgrades, as such you will have to wipe the disk in
 
 ## Why is my system slow?
 
-**Lacking or broken root patches**
+#### Lacking or broken root patches
 
 If your system is being **really** slow and macOS is lacking wallpaper and transparency in Dock and menubar, make sure to install root patches to get proper drivers and functionality. Refer to [Applying post install volume patches](https://dortania.github.io/OpenCore-Legacy-Patcher/POST-INSTALL.html#applying-post-install-volume-patches) section for more information. 
 
@@ -114,13 +114,23 @@ If your system is being **really** slow and macOS is lacking wallpaper and trans
 
 Patches can also break if automatic updates are enabled and an update prematurely modifies the system volume, refer to [System version mismatch error when root patching](https://dortania.github.io/OpenCore-Legacy-Patcher/TROUBLESHOOT-APP.html#system-version-mismatch-error-when-root-patching) for more information.
 
-**Spotlight**
+#### Spotlight
 
 If your macOS installation is recent, Spotlight starts creating a full disk index which can cause high CPU load, high temps and general slowness. It's recommended to keep the system running for few hours, once Spotlight has indexed the load will ease. A way to check whether it's caused by Spotlight is to open Activity Monitor, choosing "All Processes" from the "View" menu item, then sorting by the CPU value to see if a process called ```mds_stores``` is using a lot of CPU resources.
 
-**Heavier macOS versions**
+#### Heavier macOS versions
 
 Newer operating systems are harder to run and can appear more slow. If this is the case, there is not a whole lot to do about it.
+
+#### Thermal issues or bad/missing battery
+
+If you see ```kernel_task``` hogging a lot of CPU resources in Activity Monitor (this also requires View -> All Processes), this means the system is being throttled mostly due to the following reasons:
+
+In laptops, if the battery is either missing or in bad condition, macOS will throttle the CPU quite hard in order to stay running as the charger cannot provide enough power for peak performance. You may try disabling throttling in OCLP settings but this usually leads to unexpected shutdowns during load, when the charger runs out of power to provide. Additionally, trackpad settings will be unavailable on laptops if battery is not present.
+
+Thermal issues can also throttle the CPU, in this case it may be recommended to repaste the system.
+
+You can use [Intel Power Gadget (Web Archive)](https://web.archive.org/web/20220701164200/https://www.intel.com/content/dam/develop/external/us/en/documents/downloads/intel-power-gadget.dmg) to monitor CPU frequency, AVG and REQ should mostly match each other.
 
 ## Applications crashing with "illegal instruction"
 
@@ -180,7 +190,7 @@ AMD Navi (RX 5000 - 6000 series) GPUs are non-functional in Mac Pro 2008 to 2012
 :::
 
 Refer to the following pages for more information
-- [Supported models,](https://dortania.github.io/OpenCore-Legacy-Patcher/MODELS.html) 
+- [Supported models](https://dortania.github.io/OpenCore-Legacy-Patcher/MODELS.html) 
 - [Non-Metal GitHub issue](https://github.com/dortania/OpenCore-Legacy-Patcher/issues/108)
 - [Non-Metal Issues](https://dortania.github.io/OpenCore-Legacy-Patcher/TROUBLESHOOT-NONMETAL.html)
 - [Hardware troubleshooting](https://dortania.github.io/OpenCore-Legacy-Patcher/TROUBLESHOOT-HARDWARE)
@@ -229,6 +239,11 @@ iPhone Mirroring requires a T2 chip, which means it will not be available on OCL
 ## Where is Apple Intelligence?
 
 Apple Intelligence requires Neural Engine, which is only found in Apple Silicon chips.
+
+
+
+
+
 
 
 
